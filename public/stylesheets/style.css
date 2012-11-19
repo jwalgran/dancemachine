@@ -1,0 +1,32 @@
+body {
+  padding: 20px;
+  font: 14px Helvetica, Arial, sans-serif;
+}
+
+.transport a {
+  color: #fff;
+  background: #555;
+  padding: 10px;
+  display: inline-block;
+  width: 4em;
+}
+
+.transport {
+    padding: 20px 20px 20px 0;
+    font-size: 1.4em;
+    color: #fff;
+}
+
+.transport a {
+    padding-right: 20px;
+}
+
+.track {
+    font-size: 2.4em;
+    padding: 20px;
+    background: #ddd;
+}
+
+.track .name {
+    font-weight: bold;
+}

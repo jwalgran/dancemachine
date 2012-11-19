@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <div class="transport">
+        <a href="#" class="previous">Previous</a>
+        <a href="#" class="playpause <%= currentTrack ? 'playing' : 'paused' %>"><%= currentTrack ? "Pause" : "Play" %></a>
+        <a href="#" class="next">Next</a>
+    </div>
+    <div class="track">
+        <div class="name"><%= currentTrack ? currentTrack.name : '' %></div>
+        <div class="artist"><%= currentTrack ? currentTrack.artist : '' %></div>
+        <div class="album"><%= currentTrack ? currentTrack.album : '' %></div>
+        <div class="notplaying" style="<%= currentTrack ? 'display: none;' : '' %>">Not Playing</div>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        dancemachine = {};
+        var socket = io.connect('http://localhost');
+        var update = function(currentTrack) {
+            dancemachine.currentTrack = currentTrack;
+            if (currentTrack) {
+                $('.playpause').removeClass('paused').addClass('playing').text("Pause")
+                $('div.name').text(currentTrack.name);
+                $('div.artist').text(currentTrack.artist);
+                $('div.album').text(currentTrack.album);
+                $('div.notplaying').hide();
+            } else {
+                $('.playpause').removeClass('playing').addClass('paused').text("Play")
+                $('div.name').text('');
+                $('div.artist').text('');
+                $('div.album').text('');
+                $('div.notplaying').show();
+            }
+        };
+        var togglePlayback = function() {
+            if (dancemachine.currentTrack) {
+                socket.emit('pause');
+            } else {
+                socket.emit('play');
+            }
+        }
+        socket.on('currentTrack', function (currentTrack) {
+            update(currentTrack);
+        });
+        socket.on('paused', function (currentTrack) {
+            update(currentTrack);
+        });
+        $('.playpause').click(function(e){
+            e.stopPropagation();
+            togglePlayback();
+        });
+        $('.previous').click(function(e){
+            e.stopPropagation();
+            socket.emit('previous');
+        });
+        $('.next').click(function(e){
+            e.stopPropagation();
+            socket.emit('next');
+        });
+
+        $("body").keydown(function(e) {
+            if (e.keyCode === 32) {
+                togglePlayback();
+            } else if (e.keyCode === 39) {
+                socket.emit('next');
+            } else if (e.keyCode === 37) {
+                socket.emit('previous');
+            }
+        });
+    </script>
+  </body>
+</html>
